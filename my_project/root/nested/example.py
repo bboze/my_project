@@ -36,6 +36,8 @@ pn = PrimNum('tst', 10);
 pn.print_successive_primes(5, 10)
 
 pn.is_prime(2)
+
+pn.is_prime(3)
         
 #prim.print_successive_primes(5)                 
 
