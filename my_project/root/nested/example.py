@@ -1,44 +1,117 @@
-'''
-Created on 30 Apr 2018
-
-@author: branko
-'''
-
 import sys
-from root.nested.prim import PrimNum
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
 
-if __name__ == '__main__':
-    print('Hello World')
+from root.nested.wst import Wst
 
-print(sys.path)
-
-print((lambda isOdd: isOdd(4))(lambda x: x % 2 != 0))
-
-def function():
- print('It is a function.')
  
-foo = function
-function()
-
-import pickle
-
-
-website = {'title' : 'Techbeamers', 'site_link' : '/','site_type': 'technology blog','owner':'Python Serialization tutorial','established_date':'Sep2015'}
-
-with open ('website.pickle','wb') as f:
-    pickle.dump(website,f)
-
-with open ('website.pickle', 'rb') as f:
-    data = pickle.load(f)
-    print (data)
-
-pn = PrimNum('tst', 10); 
-pn.print_successive_primes(5, 10)
-
-pn.is_prime(2)
-
-
-pn.is_prime(3)
+class App(QMainWindow):
+ 
+    def __init__(self):
+        super().__init__()
+        self.title = 'WEB SERVICES TEST TOOL'
+        self.left = 50
+        self.top = 50
+        self.width = 640
+        self.height = 400
         
-#prim.print_successive_primes(5)                 
+        #create GUI
+        self.initUI()        
+        
+ 
+    def initUI(self):
+        #window setting
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+ 
+        #file menu
+        mainMenu = self.menuBar() 
+        fileMenu = mainMenu.addMenu('File')
+        editMenu = mainMenu.addMenu('Edit')
+        viewMenu = mainMenu.addMenu('View')
+        searchMenu = mainMenu.addMenu('Search')
+        toolsMenu = mainMenu.addMenu('Tools')
+        helpMenu = mainMenu.addMenu('Help')
+ 
+        exitButton = QAction(QIcon('exit24.png'), 'Exit', self)
+        exitButton.setShortcut('Ctrl+Q')
+        exitButton.setStatusTip('Exit application')
+        exitButton.triggered.connect(self.close)
+        fileMenu.addAction(exitButton)
+        
+        #main window components
+        centralWidget = MainWindow()          
+        self.setCentralWidget(centralWidget) 
+ 
+        self.show()
+ 
+class MainWindow(QWidget):
+ 
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+        
+ 
+    def initUI(self):
+        self.createGridLayout()
+ 
+        windowLayout = QVBoxLayout()
+        windowLayout.addWidget(self.horizontalGroupBox)
+        self.setLayout(windowLayout)
+ 
+        
+    def createGridLayout(self):      
+        self.horizontalGroupBox = QGroupBox("")
+        
+        self.title = QLabel('Title')
+        self.urlLabel = QLabel('URL')
+        self.resLabel = QLabel('Response')
+        self.titleEdit = QLineEdit()
+        self.urlEdit = QLineEdit()
+        self.urlEdit.setText("http://api.football-data.org/v1/competitions/467/teams") 
+        self.responseEdit = QTextEdit()  
+        self.getButton = QPushButton("GET") 
+        self.getButton.clicked.connect(self.get_clicked)
+        self.cancelButton = QPushButton("Cancel")         
+                
+        
+        grid = QGridLayout()
+        grid.setSpacing(10)
 
+        grid.addWidget(self.title, 1, 0)
+        grid.addWidget(self.titleEdit, 1, 1)
+
+        grid.addWidget(self.urlLabel, 2, 0)
+        grid.addWidget(self.urlEdit, 2, 1)
+
+        grid.addWidget(self.resLabel, 3, 0)
+        grid.addWidget(self.responseEdit, 3, 1, 5, 1)
+        
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(self.getButton)
+        hbox.addWidget(self.cancelButton)
+        
+        grid.addLayout(hbox, 9, 1) 
+
+        self.horizontalGroupBox.setLayout(grid)
+        
+        self.show()
+    
+    #call and get response from web service    
+    def get_clicked(self):
+        try: 
+            self.responseEdit.setText("")
+            wst = Wst()
+            response = wst.call_ws(self.urlEdit.text())
+            self.responseEdit.append(response)
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+       
+        
+#application entry point 
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
