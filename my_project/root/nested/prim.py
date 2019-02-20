@@ -1,6 +1,5 @@
 import math
 
-
 class PrimNum:
     
    empCount = 0
