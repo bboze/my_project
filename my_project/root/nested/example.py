@@ -3,7 +3,16 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot
 
-from root.nested.wst import Wst
+#from root.nested.wst import Wst
+
+from wst import Wst
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+import traceback
+import time
+
 
  
 class App(QMainWindow):
@@ -40,12 +49,28 @@ class App(QMainWindow):
         exitButton.triggered.connect(self.close)
         fileMenu.addAction(exitButton)
         
+        browseButton = QAction(QIcon('exit24.png'), 'Browser', self)
+        browseButton.setShortcut('Ctrl+B')
+        browseButton.setStatusTip('Open browser')
+        browseButton.triggered.connect(self.test_browser)
+        toolsMenu.addAction(browseButton)        
+        
         #main window components
         centralWidget = MainWindow()          
         self.setCentralWidget(centralWidget) 
+        
+        self.statusBar()
  
         self.show()
- 
+        
+    def test_browser(self):
+        try:           
+            wst = Wst()
+            wst.popuniKladionicu()
+        except:
+            print("Unexpected error:", sys.exc_info()[0])     
+            
+            
 class MainWindow(QWidget):
  
     def __init__(self):
@@ -101,13 +126,14 @@ class MainWindow(QWidget):
     
     #call and get response from web service    
     def get_clicked(self):
-        try: 
+        try:           
             self.responseEdit.setText("")
             wst = Wst()
             response = wst.call_ws(self.urlEdit.text())
             self.responseEdit.append(response)
         except:
             print("Unexpected error:", sys.exc_info()[0])
+                     
        
         
 #application entry point 
